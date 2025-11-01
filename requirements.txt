@@ -1,0 +1,5 @@
+astropy>=5.0
+numpy>=1.20
+matplotlib>=3.5
+scipy>=1.9
+jupyter>=1.0
