@@ -15,6 +15,7 @@ def main():
 
     wavelength, flux = read_spectrum(data_file)
     plot_spectrum(wavelength, flux, 'Vega Spectrum')
-
+    # 检查数据范围
+    print(f"通量范围: {flux.min():.2e} - {flux.max():.2e}")
 if __name__ == "__main__":
     main()

@@ -5,8 +5,16 @@ def plot_spectrum(wavelength, flux, title="Spectrum"):
     plt.figure(figsize=(10, 5))
     plt.plot(wavelength, flux, 'b-', linewidth=1)
     plt.xlabel('Wavelength')
-    plt.ylabel('Flux')
+    plt.ylabel('Log Flux')
+    plt.yscale('log')
     plt.title(title)
     plt.grid(True, alpha=0.3)
+    plt.xlim(0, 40000)
+
+    # 主要波长区域标注
+    plt.axvspan(1000, 4000, alpha=0.1, color='purple', label='UV')
+    plt.axvspan(4000, 7000, alpha=0.1, color='blue', label='Optical')
+    plt.axvspan(7000, 40000, alpha=0.1, color='red', label='IR')
+
     plt.tight_layout()
     plt.show()
