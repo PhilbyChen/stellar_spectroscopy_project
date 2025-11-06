@@ -10,24 +10,18 @@ from astropy.io import fits
 #   1-  9  F9.2    0.1nm      lambda    [900/] Wavelength {lambda} in {AA}
 #  11- 23  E13.7   cW/m2/nm   Flux      Flux; in erg/s/cm^2^/A
 
-def read_vega_spectrum(datapath):
-    with fits.open(datapath) as hdul:   #用with打开可以自动打开和关闭文件；hdul是包含hits文件中所有数据单元Header/Data Units的列表
+
+def read_vega_spectrum(data_file):
+    with fits.open(data_file) as hdul:
         for hdu in hdul:
-            data = hdu.data
-            wavelength = data[:, 0]  # 所有行的第0列
-            flux = data[:, 1]        # 所有行的第1列
-            return wavelength,flux
-        
-def read_spectrum(file_path):
-    with fits.open(file_path) as hdul:
-        # 获取第一个数据表（通常是hdul[1]）
-        data = hdul[1].data
-        
-        # 提取列名
-        col_names = data.dtype.names
-        
-        # 假设第一列是波长，第二列是通量
-        wavelength = data[col_names[0]]
-        flux = data[col_names[1]]
-        
-        return wavelength, flux
+            # 只处理有数据的HDU
+            if hasattr(hdu, 'data') and hdu.data is not None:
+                data = hdu.data
+                wavelength = data[:, 0]  # 所有行的第0列
+                flux = data[:, 1]        # 所有行的第1列
+              
+                print(f"波长范围: {wavelength.min():.1f} - {wavelength.max():.1f} Å")
+                print(f"通量范围: {flux.min():.2e} - {flux.max():.2e} FLAM")
+              
+                return wavelength, flux
+        raise ValueError("没有找到包含数据的HDU")

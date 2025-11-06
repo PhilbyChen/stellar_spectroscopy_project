@@ -12,7 +12,8 @@ print(" 所有模块导入成功！")
 
 def main():
     # 使用绝对路径
-    data_file = os.path.join(os.path.dirname(__file__), 'data', 'J_AJ_146_68_table26.dat.fits')
+    data_file = r"D:\Documents\GitHub\stellar_spectroscopy_project\data\alpha_lyr_stis_011.fits"
+    print(f"读取文件: {data_file}")
 
     wavelength, flux = read_spectrum(data_file)
     plot_spectrum(wavelength, flux, 'Vega Spectrum')
