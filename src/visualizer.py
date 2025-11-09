@@ -14,6 +14,7 @@ def plot_spectrum(wavelength, flux, title="Spectrum"):
     plt.axvspan(1000, 4000, alpha=0.1, color='purple', label='UV')
     plt.axvspan(4000, 7000, alpha=0.1, color='blue', label='Optical')
     plt.axvspan(7000, 40000, alpha=0.1, color='red', label='IR')
+    plt.legend()
 
     plt.tight_layout()
     plt.show()
