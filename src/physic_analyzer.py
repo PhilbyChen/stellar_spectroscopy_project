@@ -1,6 +1,6 @@
 import numpy as np
 
-#1.维恩位移定律估算表面温度
+'''1.维恩位移定律估算表面温度'''
 # λmax*T=b
 def surface_temperature(wavelength,flux):
 
@@ -11,11 +11,11 @@ def surface_temperature(wavelength,flux):
 
     return T
 
-#2.普朗克黑体辐射拟合
+'''2.普朗克黑体辐射拟合'''
 def fit_blackbody(wavelength,flux):
     from scipy.optimize import curve_fit
     def planck_law(wl,temperature,scale):
-        # lamda wl：波长
+        # wl：波长
         # Tem: 温度
         # scale: 匹配因子
 
@@ -52,3 +52,47 @@ def fit_blackbody(wavelength,flux):
     fitted_curve = planck_law(wavelength, temperature, scale_factor)
     
     return temperature, fitted_curve
+
+
+'''3.氢巴尔末谱线'''
+#测量四条氢谱线等值宽度与半高全宽
+def balmerlines(wavelength,flux):
+    balmer_lines = {
+    'Hα': 6562.8,
+    'Hβ': 4861.3,
+    'Hγ': 4340.5,
+    'Hδ': 4101.7
+    }
+
+    results = {} # 初始化空字典存储等值宽度
+
+    for name,center in balmer_lines.items():
+        
+        #吸收谱线
+        line_region = (wavelength > center - 5) & (wavelength < center - 5)
+        #两侧连续谱
+        left_continuum = (wavelength > center - 20) & (wavelength < center - 10)
+        right_continuum = (wavelength > center + 10) & (wavelength < center + 20)
+
+        #计算平均连续谱Fc
+        left_flux = np.mean(flux[left_continuum])  # ***[***] :布尔索引，提取left_continuum里为True的flux值
+        right_flux = np.mean(flux[right_continuum])
+        Fc = (left_flux + right_flux) / 2
+
+        ### 计算等值宽度
+
+        line_wl = wavelength[line_region]
+        Fλ = flux[line_region]
+        depth = (Fc - Fλ) / Fc
+        # 计算波长步长：相邻波长点之间的平均间隔
+        # np.diff(wavelength) 计算相邻元素的差值
+        wl_step = np.diff(wavelength).mean()
+        # 深度在步长上积分
+        # W = ∫(Fc − Fλ) / Fc dλ
+        W = np.sum(depth) * wl_step
+        results[name] = W
+        
+        # f"{name}: {W:.2f} Å" 是f-string格式化字符串
+        print(f"  {name}: {W:.2f} Å")
+    
+    return results
