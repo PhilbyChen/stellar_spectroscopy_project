@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
+'''波长-通量图'''
 def plot_spectrum(wavelength, flux, title="Spectrum"):
-    """绘制光谱图"""
     plt.figure(figsize=(10, 5))
     plt.plot(wavelength, flux, 'b-', linewidth=1)
     plt.xlabel('Wavelength')

@@ -13,8 +13,8 @@ def read_vega_spectrum(data_file):
         return wavelength, flux
     
     
-def noemalize_flux(wavelength,flux):
+def normalize_flux(wavelength,flux):
     max_flux = np.max(flux)
-    normalized_flux = flux/max_flux
+    norm_flux = flux/max_flux
 
-    return normalized_flux,wavelength,flux
+    return wavelength, norm_flux, max_flux

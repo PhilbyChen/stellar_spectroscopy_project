@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 
 # 设置路径
 src_dir = os.path.join(os.path.dirname(__file__), 'src')
@@ -25,14 +26,22 @@ def main():
 
     # ====================普朗克黑体辐射拟合====================
     # 归一化处理
-    from dataloader import noemalize_flux
-    wl_norm, flux_norm, max_flux = noemalize_flux(wavelength, flux)
+    from dataloader import normalize_flux
+    wl_norm, flux_norm, max_flux = normalize_flux(wavelength, flux)
     
     # 黑体拟合
     from physic_analyzer import fit_blackbody
     temperature, fitted_curve = fit_blackbody(wl_norm, flux_norm)
     
     print(f"黑体拟合温度: {temperature:.0f} K")
+
+
+    # ====================氢巴尔末谱线====================
+    from dataloader import normalize_flux
+    wl_norm, flux_norm, max_flux = normalize_flux(wavelength, flux)
+
+    from physic_analyzer import balmerlines
+    W = balmerlines(wl_norm, flux_norm)
 
 
 if __name__ == "__main__":
