@@ -6,11 +6,13 @@ def read_vega_spectrum(data_file):
         data = hdul[1].data
         wavelength = data["WAVELENGTH"]
         flux = data["FLUX"]
+        instrument_FWHM = data["FWHM"]   # full width at half-maximum
+        totexp = data["TOTEXP"]   # 曝光时间
 
         print(f"波长范围: {wavelength.min():.1f} - {wavelength.max():.1f} Å")
         print(f"通量范围: {flux.min():.2e} - {flux.max():.2e}")
         
-        return wavelength, flux
+        return wavelength, flux, instrument_FWHM, totexp
     
     
 def normalize_flux(wavelength,flux):

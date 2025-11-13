@@ -11,6 +11,7 @@ def surface_temperature(wavelength,flux):
 
     return T
 
+
 '''2.普朗克黑体辐射拟合'''
 def fit_blackbody(wavelength,flux):
     from scipy.optimize import curve_fit
@@ -34,7 +35,6 @@ def fit_blackbody(wavelength,flux):
         
         return scaled_flux
   
-
     # ==================== 执行曲线拟合 ====================
     # 使用非线性最小二乘法找到最佳的黑体参数
     # 初始猜测值: [温度, 缩放因子]
@@ -54,7 +54,7 @@ def fit_blackbody(wavelength,flux):
     return temperature, fitted_curve
 
 
-'''3.氢巴尔末谱线'''
+'''3.氢巴尔末谱线-等值宽度'''
 #测量四条氢谱线等值宽度与半高全宽
 def balmerlines(wavelength,flux):
     balmer_lines = {'Hα': 6562.8, 'Hβ': 4861.3, 'Hγ': 4340.5, 'Hδ': 4101.7}
@@ -87,3 +87,35 @@ def balmerlines(wavelength,flux):
         print(f"'等值宽度,'{name}: {W:.4f} Å")
     
     return results
+
+
+'''4.测量半高全宽'''
+def measure_fwhm(wavelength,flux,center,instrument_FWHM):
+    line_region = (wavelength > center - 15) & (wavelength < center + 15)
+    line_wl = wavelength[line_region]
+    line_flux = flux[line_region]
+
+    # Another measure of the width of a spectral line is the change in wavelength from one side of the line to the other, 
+    #   where its depth (Fc − Fλ)/(Fc − Fλ0) = 1/2; this is called the full width at half-maximum and will be denoted by (3λ)1/2.
+
+    # “半高” 部分
+    line_depth = 1 - np.min(line_flux)
+    half_depth = 1 - line_depth / 2
+    half_level = 1 - half_depth
+    # "全宽" 部分
+    # 数组位置索引
+    below_positions = np.where(line_flux < half_level)[0]
+    left_position = below_positions[0]  #第一个低于半高水平的点
+    right_position = below_positions[-1]  # 最后一个
+
+    observed_fwhm = line_wl[left_position] - line_wl[right_position]
+ 
+    # 修正仪器展宽
+    intrinsic_fwhm_squared = observed_fwhm**2 - instrument_FWHM**2
+    
+    if intrinsic_fwhm_squared > 0:
+        intrinsic_fwhm = np.sqrt(intrinsic_fwhm_squared)
+    else:
+        intrinsic_fwhm = 0.0
+    
+    return intrinsic_fwhm
