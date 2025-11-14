@@ -11,8 +11,19 @@ def surface_temperature(wavelength,flux):
 
     return T
 
+'''2.巴尔末跳跃'''
+def locate_balmer_jump(wavelength,flux):
+    search_region = (wavelength > 2000) & (wavelength < 5000)
+    wl_search = wavelength[search_region]
+    flux_search = flux[search_region]
+    # 找到梯度最大点
+    max_gradient_index = np.argmax(np.diff(flux_search))
+    balmer_jump_wavelength = wl_search[max_gradient_index + 1] # +1 因为diff使数组缩短了一位
+    print(f"巴尔末跳跃位置: {balmer_jump_wavelength:.1f} Å")
 
-'''2.普朗克黑体辐射拟合'''
+    return balmer_jump_wavelength
+
+'''3.普朗克黑体辐射拟合'''
 def fit_blackbody(wavelength,flux):
     from scipy.optimize import curve_fit
     def planck_law(wl,temperature,scale):
@@ -39,11 +50,16 @@ def fit_blackbody(wavelength,flux):
     # 使用非线性最小二乘法找到最佳的黑体参数
     # 初始猜测值: [温度, 缩放因子]
     # 织女星是A型星，温度约9600K，所以用10000K作为初始值
+    from physic_analyzer import locate_balmer_jump
+    balmer_jump_wavelength = locate_balmer_jump(wavelength,flux)
+    long_wavelength_region = (wavelength > balmer_jump_wavelength) & (wavelength < 25000)
+    wavelength_fit = wavelength[long_wavelength_region]
+    flux_fit = flux[long_wavelength_region]
+    
     # 缩放因子初始为1.0，让拟合算法自动调整
     initial_guess = [10000, 1.0]
-    
     # 执行拟合: 找到使理论曲线最接近观测数据的参数
-    popt, _ = curve_fit(planck_law, wavelength, flux, p0=initial_guess)
+    popt, _ = curve_fit(planck_law, wavelength_fit, flux_fit, p0=initial_guess)
     
     # 提取拟合结果
     temperature, scale_factor = popt
@@ -54,7 +70,7 @@ def fit_blackbody(wavelength,flux):
     return temperature, fitted_curve
 
 
-'''3.氢巴尔末谱线-等值宽度'''
+'''4.氢巴尔末谱线-等值宽度'''
 #测量四条氢谱线等值宽度与半高全宽
 def balmerlines(wavelength,flux):
     balmer_lines = {'Hα': 6562.8, 'Hβ': 4861.3, 'Hγ': 4340.5, 'Hδ': 4101.7}
@@ -89,7 +105,7 @@ def balmerlines(wavelength,flux):
     return results
 
 
-'''4.测量半高全宽'''
+'''5.测量半高全宽'''
 def measure_fwhm(wavelength,flux,center,instrument_FWHM):
     line_region = (wavelength > center - 15) & (wavelength < center + 15)
     line_wl = wavelength[line_region]
@@ -119,3 +135,4 @@ def measure_fwhm(wavelength,flux,center,instrument_FWHM):
         intrinsic_fwhm = 0.0
     
     return intrinsic_fwhm
+
