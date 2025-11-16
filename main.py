@@ -42,7 +42,12 @@ def main():
 
     from physic_analyzer import balmerlines
     W = balmerlines(wl_norm, flux_norm)
-
-
+    
+    # ====================压力展宽判断光度================
+    from dataloader import normalize_flux
+    wl_norm, norm_flux, max_flux = normalize_flux(wavelength, flux)
+    from physic_analyzer import pressure_broadening
+    luminosity_class = pressure_broadening(wavelength, norm_flux, instrument_FWHM)
+    return luminosity_class
 if __name__ == "__main__":
     main()

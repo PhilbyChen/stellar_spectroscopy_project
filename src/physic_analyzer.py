@@ -106,33 +106,59 @@ def balmerlines(wavelength,flux):
 
 
 '''5.测量半高全宽'''
-def measure_fwhm(wavelength,flux,center,instrument_FWHM):
+def measure_fwhm(wavelength,norm_flux,center,instrument_FWHM):
+    
     line_region = (wavelength > center - 15) & (wavelength < center + 15)
     line_wl = wavelength[line_region]
-    line_flux = flux[line_region]
+    line_flux = norm_flux[line_region]
 
     # Another measure of the width of a spectral line is the change in wavelength from one side of the line to the other, 
     #   where its depth (Fc − Fλ)/(Fc − Fλ0) = 1/2; this is called the full width at half-maximum and will be denoted by (3λ)1/2.
 
     # “半高” 部分
     line_depth = 1 - np.min(line_flux)
-    half_depth = 1 - line_depth / 2
-    half_level = 1 - half_depth
+    # 半高位置 = 连续谱水平 - 半深度 = 1 - line_depth/2
+    half_level = 1.0 - line_depth / 2.0
     # "全宽" 部分
     # 数组位置索引
     below_positions = np.where(line_flux < half_level)[0]
     left_position = below_positions[0]  #第一个低于半高水平的点
     right_position = below_positions[-1]  # 最后一个
 
-    observed_fwhm = line_wl[left_position] - line_wl[right_position]
+    observed_fwhm = line_wl[right_position] - line_wl[left_position]
  
     # 修正仪器展宽
     intrinsic_fwhm_squared = observed_fwhm**2 - instrument_FWHM**2
     
-    if intrinsic_fwhm_squared > 0:
+    if (intrinsic_fwhm_squared > 0).all():
         intrinsic_fwhm = np.sqrt(intrinsic_fwhm_squared)
     else:
         intrinsic_fwhm = 0.0
     
     return intrinsic_fwhm
 
+
+
+'''测量压力展宽'''
+def pressure_broadening(wavelength, norm_flux, instrument_FWHM):
+
+    test_lines = {
+        'Hγ': 4340.5,
+        'Fe_I_4383': 4383.5
+    }
+    results = {}
+    for name,center in test_lines.items():
+        fwhm = measure_fwhm(wavelength,norm_flux,center,instrument_FWHM)
+        results[name] = fwhm
+
+    H_width = results['Hγ']
+    Fe_width = results['Fe_I_4383']
+    width_difference = H_width - Fe_width
+    print("H_width:",H_width,
+          "Fe_width:",Fe_width,
+          "width_difference:",width_difference)
+    if width_difference > 3.0:
+            print("主序星范围，光度V")
+    else:
+            print("巨星范围")
+    return results
