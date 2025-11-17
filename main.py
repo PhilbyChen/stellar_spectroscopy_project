@@ -49,5 +49,6 @@ def main():
     from physic_analyzer import pressure_broadening
     luminosity_class = pressure_broadening(wavelength, norm_flux, instrument_FWHM)
     return luminosity_class
+
 if __name__ == "__main__":
     main()

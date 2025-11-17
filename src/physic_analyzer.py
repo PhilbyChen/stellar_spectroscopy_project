@@ -104,7 +104,6 @@ def balmerlines(wavelength,flux):
     
     return results
 
-
 '''5.测量半高全宽'''
 def measure_fwhm(wavelength,norm_flux,center,instrument_FWHM):
     
@@ -138,8 +137,6 @@ def measure_fwhm(wavelength,norm_flux,center,instrument_FWHM):
     return intrinsic_fwhm
 
 
-
-'''测量压力展宽'''
 def pressure_broadening(wavelength, norm_flux, instrument_FWHM):
 
     test_lines = {
